@@ -68,14 +68,26 @@ function loadData() {
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf8');
     const parsed = JSON.parse(raw);
-    // backfill any missing top-level keys from defaults (non-destructive)
     let changed = false;
+
     for (const key of Object.keys(DEFAULTS)) {
       if (!(key in parsed)) {
         parsed[key] = DEFAULTS[key];
         changed = true;
       }
     }
+
+    // Seeded lists (restaurants, links) should never sit empty if we shipped
+    // starter data for them — refill if the array exists but has nothing in it.
+    const seededArrayKeys = ['restaurants', 'links'];
+    for (const key of seededArrayKeys) {
+      if (Array.isArray(parsed[key]) && parsed[key].length === 0 && DEFAULTS[key].length > 0) {
+        parsed[key] = JSON.parse(JSON.stringify(DEFAULTS[key]));
+        changed = true;
+        console.log(`Refilled empty "${key}" with seed data`);
+      }
+    }
+
     if (changed) fs.writeFileSync(DATA_FILE, JSON.stringify(parsed, null, 2));
     return parsed;
   } catch (e) {

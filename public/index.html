@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chatfield 2026</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --pine: #1f3d2e;
+    --pine-dark: #142a20;
+    --lake: #2b6e8f;
+    --lake-light: #4a94b8;
+    --sand: #e8dfc8;
+    --amber: #d98c3f;
+    --ember: #c2543a;
+    --cream: #faf6ec;
+    --text-dark: #23291f;
+    --text-mid: #56604f;
+    --card-bg: #ffffff;
+    --border: #e2ddc9;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  }
+  header.hero {
+    position: relative;
+    background: url('images/hero-bg.png') center 35% / cover no-repeat, linear-gradient(160deg, var(--pine) 0%, var(--pine-dark) 60%, #0d1f16 100%);
+    color: white;
+    padding: env(safe-area-inset-top, 20px) 20px 28px;
+    overflow: hidden;
+  }
+  header.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(170deg, rgba(20,42,32,0.72) 0%, rgba(15,31,23,0.82) 55%, rgba(13,25,18,0.92) 100%);
+    z-index: 0;
+  }
+  header.hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, rgba(43,110,143,0.25));
+    z-index: 1;
+  }
+  header.hero > * {
+    position: relative;
+    z-index: 2;
+  }
+  .hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 14px 0 2px;
+    letter-spacing: -0.3px;
+  }
+  .hero-sub {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 18px;
+  }
+  .gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 6px 0 4px;
+  }
+  .gauge-caption {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--sand);
+    opacity: 0.8;
+    margin-top: -6px;
+    font-weight: 700;
+  }
+  .gauge-big-label {
+    font-size: 13px;
+    font-weight: 800;
+    margin-top: -2px;
+  }
+  .gauge-big-label.redline { color: #ff6b5e; }
+  .gauge-big-label.normal { color: var(--sand); }
+
+  .countdown-wrap {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .count-box {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px;
+    padding: 10px 6px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+  }
+  .count-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--sand);
+  }
+  .count-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+  main { padding: 16px; max-width: 640px; margin: 0 auto; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 10px;
+    color: var(--pine);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-mid);
+    margin: 18px 0 8px 4px;
+    font-weight: 700;
+  }
+  .crew-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .crew-chip {
+    background: var(--sand);
+    color: var(--pine-dark);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .row:last-child { border-bottom: none; }
+  .row .label { color: var(--text-mid); }
+  .row .value { font-weight: 600; }
+
+  /* Tab bar */
+  nav.tabbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 6px 4px env(safe-area-inset-bottom, 6px);
+    z-index: 100;
+  }
+  nav.tabbar button {
+    flex: 1;
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 2px;
+    color: var(--text-mid);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  nav.tabbar button .icon { font-size: 17px; }
+  nav.tabbar button { font-size: 9.5px; }
+  nav.tabbar button.active { color: var(--lake); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadein 0.2s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
+
+  /* Restaurant list */
+  .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+  .filter-chip {
+    white-space: nowrap;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+  }
+  .filter-chip.active { background: var(--lake); color: white; border-color: var(--lake); }
+
+  .place-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .place-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .place-name { font-weight: 700; font-size: 15px; }
+  .place-cat {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .cat-Restaurant { background: #fdece2; color: var(--ember); }
+  .cat-Brewery { background: #fbeed4; color: var(--amber); }
+  .cat-Coffee\/Cafe { background: #e2eef2; color: var(--lake); }
+  .place-notes { font-size: 13px; color: var(--text-mid); margin-top: 5px; }
+  .place-meta { font-size: 12px; color: #94a08c; margin-top: 6px; display: flex; justify-content: space-between; }
+  .place-rating { color: var(--amber); font-weight: 700; }
+  .del-btn { background: none; border: none; color: #c2543a; font-size: 12px; cursor: pointer; padding: 0; }
+
+  .add-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .add-form input, .add-form select {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .add-btn {
+    background: var(--lake);
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .add-btn:active { opacity: 0.85; }
+  details.add-details summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--lake);
+    padding: 8px 0;
+  }
+  details.add-details summary::-webkit-details-marker { display: none; }
+
+  /* Links */
+  .link-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--text-dark);
+  }
+  .link-left { flex: 1; }
+  .link-label { font-weight: 700; font-size: 14px; }
+  .link-notes { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+  .link-arrow { color: var(--lake); font-size: 18px; margin-left: 8px; }
+
+  /* Calendar */
+  .day-row {
+    display: flex;
+    gap: 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .day-row.has-events { border-color: var(--lake-light); }
+  .day-date {
+    flex-shrink: 0;
+    width: 46px;
+    text-align: center;
+  }
+  .day-date .dow { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-mid); }
+  .day-date .dom { font-size: 20px; font-weight: 800; color: var(--pine); }
+  .day-body { flex: 1; min-width: 0; }
+  .day-events { display: flex; flex-direction: column; gap: 6px; }
+  .event-chip {
+    background: var(--cream);
+    border-left: 3px solid var(--lake);
+    border-radius: 8px;
+    padding: 7px 10px;
+  }
+  .event-title { font-size: 13.5px; font-weight: 700; color: var(--text-dark); }
+  .event-notes { font-size: 12px; color: var(--text-mid); margin-top: 1px; }
+  .event-meta { font-size: 11px; color: #94a08c; margin-top: 3px; display: flex; justify-content: space-between; align-items: center; }
+  .day-empty { font-size: 12.5px; color: #b7bfae; padding-top: 4px; }
+
+  /* Packing */
+  .pack-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .pack-item input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--lake); flex-shrink: 0; }
+  .pack-item .txt { flex: 1; font-size: 14px; }
+  .pack-item.checked .txt { text-decoration: line-through; color: #a3ab9b; }
+  .pack-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--sand); color: var(--pine-dark); }
+
+  /* Weather */
+  .weather-current {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0 16px;
+  }
+  .weather-temp { font-size: 46px; font-weight: 800; color: var(--pine); }
+  .weather-desc { font-size: 14px; color: var(--text-mid); margin-top: 2px; }
+  .weather-icon { font-size: 42px; }
+  .forecast-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .fday {
+    flex-shrink: 0;
+    width: 68px;
+    text-align: center;
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 10px 4px;
+  }
+  .fday .fname { font-size: 11px; font-weight: 700; color: var(--text-mid); }
+  .fday .ficon { font-size: 22px; margin: 6px 0; }
+  .fday .fhi { font-size: 13px; font-weight: 700; }
+  .fday .flo { font-size: 11px; color: var(--text-mid); }
+
+  .empty-state { text-align: center; padding: 30px 10px; color: var(--text-mid); font-size: 14px; }
+  .loading { text-align: center; padding: 20px; color: var(--text-mid); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-title">🏕️ Chatfield 2026</div>
+  <div class="hero-sub">Chatfield State Park · Aug 12–23 · 11 nights</div>
+
+  <div class="gauge-wrap">
+    <svg id="tacho" viewBox="0 0 240 150" width="220" height="138">
+      <!-- track arc (sweeps 210deg to -30deg, i.e. left to right across the top) -->
+      <path id="tacho-track" d="" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="14" stroke-linecap="round"/>
+      <!-- redline arc, last 2 days -->
+      <path id="tacho-redline" d="" fill="none" stroke="#e64b3c" stroke-width="14" stroke-linecap="round"/>
+      <!-- tick marks -->
+      <g id="tacho-ticks"></g>
+      <!-- needle -->
+      <g id="tacho-needle-group">
+        <line id="tacho-needle" x1="120" y1="120" x2="120" y2="45" stroke="#f2c14e" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <circle cx="120" cy="120" r="8" fill="#f2c14e" stroke="#7a5a18" stroke-width="1.5"/>
+    </svg>
+    <div class="gauge-caption">Days to go</div>
+    <div class="gauge-big-label normal" id="gauge-days-label">– days</div>
+  </div>
+
+  <div class="countdown-wrap" id="countdown">
+    <div class="count-box"><div class="count-num" id="cd-days">–</div><div class="count-label">Days</div></div>
+    <div class="count-box"><div class="count-num" id="cd-hours">–</div><div class="count-label">Hours</div></div>
+    <div class="count-box"><div class="count-num" id="cd-mins">–</div><div class="count-label">Mins</div></div>
+    <div class="count-box"><div class="count-num" id="cd-secs">–</div><div class="count-label">Secs</div></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- TRIP TAB -->
+  <section class="tab-panel active" id="tab-trip">
+    <div class="card">
+      <h2>📍 Trip Details</h2>
+      <div class="row"><span class="label">Location</span><span class="value">Chatfield State Park</span></div>
+      <div class="row"><span class="label">Check-in</span><span class="value">Wed, Aug 12, 2026</span></div>
+      <div class="row"><span class="label">Check-out</span><span class="value">Sun, Aug 23, 2026</span></div>
+      <div class="row"><span class="label">Duration</span><span class="value">11 nights</span></div>
+      <div class="row"><span class="label">Boats</span><span class="value">Both on the lake</span></div>
+    </div>
+
+    <div class="card">
+      <h2>👥 Crew</h2>
+      <div class="crew-list">
+        <span class="crew-chip">Heinlein's</span>
+        <span class="crew-chip">Herre's</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💻 Bill's Work Setup</h2>
+      <div style="font-size:13px; color:var(--text-mid); line-height:1.5;">
+        Working remotely from the camper for the stretch. Boat goes in the water and comes out to the campsite as schedule allows.
+      </div>
+    </div>
+  </section>
+
+  <!-- RESTAURANTS TAB -->
+  <section class="tab-panel" id="tab-restaurants">
+    <div class="card">
+      <h2>🍽️ Nearby Eats &amp; Drinks</h2>
+      <div style="font-size:12px; color:var(--text-mid); margin-bottom:10px;">Within about 15 minutes of the campground</div>
+      <div class="filter-row" id="filter-row">
+        <button class="filter-chip active" data-filter="All">All</button>
+        <button class="filter-chip" data-filter="Restaurant">Restaurant</button>
+        <button class="filter-chip" data-filter="Brewery">Brewery</button>
+        <button class="filter-chip" data-filter="Coffee/Cafe">Coffee/Cafe</button>
+      </div>
+      <div id="restaurant-list"><div class="loading">Loading…</div></div>
+
+      <details class="add-details">
+        <summary>+ Add a place</summary>
+        <div class="add-form">
+          <input type="text" id="r-name" placeholder="Name">
+          <select id="r-category">
+            <option>Restaurant</option>
+            <option>Brewery</option>
+            <option>Coffee/Cafe</option>
+          </select>
+          <input type="text" id="r-notes" placeholder="Notes (optional)">
+          <input type="text" id="r-addedby" placeholder="Your name">
+          <button class="add-btn" onclick="addRestaurant()">Add Place</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- WEATHER TAB -->
+  <section class="tab-panel" id="tab-weather">
+    <div class="card">
+      <h2>☀️ Chatfield Weather</h2>
+      <div id="weather-content"><div class="loading">Loading forecast…</div></div>
+    </div>
+  </section>
+
+  <!-- CALENDAR TAB -->
+  <section class="tab-panel" id="tab-calendar">
+    <div class="card">
+      <h2>📅 Trip Calendar</h2>
+      <div style="font-size:12px; color:var(--text-mid); margin-bottom:10px;">Aug 12–23 · tap + to add plans on any day</div>
+      <div id="calendar-list"><div class="loading">Loading…</div></div>
+
+      <details class="add-details">
+        <summary>+ Add an event</summary>
+        <div class="add-form">
+          <input type="date" id="e-date" min="2026-08-12" max="2026-08-23" value="2026-08-16">
+          <input type="text" id="e-title" placeholder="What's happening">
+          <input type="text" id="e-notes" placeholder="Notes (optional)">
+          <input type="text" id="e-addedby" placeholder="Your name">
+          <button class="add-btn" onclick="addEvent()">Add Event</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- LINKS TAB -->
+  <section class="tab-panel" id="tab-links">
+    <div class="card">
+      <h2>🔗 Useful Links</h2>
+      <div id="links-list"><div class="loading">Loading…</div></div>
+
+      <details class="add-details">
+        <summary>+ Add a link</summary>
+        <div class="add-form">
+          <input type="text" id="l-label" placeholder="Label (e.g. Boat Ramp Status)">
+          <input type="text" id="l-url" placeholder="https://...">
+          <input type="text" id="l-notes" placeholder="Notes (optional)">
+          <button class="add-btn" onclick="addLink()">Add Link</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- PACKING TAB -->
+  <section class="tab-panel" id="tab-packing">
+    <div class="card">
+      <h2>🎒 Packing List</h2>
+      <div id="packing-list"><div class="loading">Loading…</div></div>
+      <div class="add-form" style="margin-top:14px;">
+        <input type="text" id="p-item" placeholder="Item to pack">
+        <input type="text" id="p-addedby" placeholder="Your name">
+        <button class="add-btn" onclick="addPacking()">Add Item</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button class="active" data-tab="trip"><span class="icon">🏕️</span>Trip</button>
+  <button data-tab="restaurants"><span class="icon">🍽️</span>Eats</button>
+  <button data-tab="weather"><span class="icon">☀️</span>Weather</button>
+  <button data-tab="calendar"><span class="icon">📅</span>Calendar</button>
+  <button data-tab="links"><span class="icon">🔗</span>Links</button>
+  <button data-tab="packing"><span class="icon">🎒</span>Packing</button>
+</nav>
+
+<script>
+const CHECK_IN = new Date('2026-08-12T14:00:00-06:00');
+let tripData = { restaurants: [], links: [], packing: [], events: [] };
+let currentFilter = 'All';
+
+// ---- Tabs ----
+document.querySelectorAll('nav.tabbar button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---- Countdown ----
+const GAUGE_MAX_DAYS = 14; // full-scale of the dial
+const GAUGE_START_ANGLE = 210; // degrees, left side (max days away)
+const GAUGE_END_ANGLE = -30;   // degrees, right side (0 days / trip day)
+const GAUGE_CX = 120, GAUGE_CY = 120, GAUGE_R = 85;
+
+function polarToXY(cx, cy, r, angleDeg) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+}
+
+function describeArc(cx, cy, r, startAngle, endAngle) {
+  const start = polarToXY(cx, cy, r, startAngle);
+  const end = polarToXY(cx, cy, r, endAngle);
+  const largeArc = Math.abs(startAngle - endAngle) > 180 ? 1 : 0;
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+}
+
+function daysToAngle(days) {
+  const clamped = Math.max(0, Math.min(GAUGE_MAX_DAYS, days));
+  const frac = clamped / GAUGE_MAX_DAYS;
+  return GAUGE_START_ANGLE + frac * (GAUGE_END_ANGLE - GAUGE_START_ANGLE);
+}
+
+function initGauge() {
+  document.getElementById('tacho-track').setAttribute('d', describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, GAUGE_START_ANGLE, GAUGE_END_ANGLE));
+  const redStart = daysToAngle(2);
+  const redEnd = daysToAngle(0);
+  document.getElementById('tacho-redline').setAttribute('d', describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, redStart, redEnd));
+
+  const ticksG = document.getElementById('tacho-ticks');
+  let ticksHtml = '';
+  for (let d = 0; d <= GAUGE_MAX_DAYS; d += 2) {
+    const angle = daysToAngle(d);
+    const outer = polarToXY(GAUGE_CX, GAUGE_CY, GAUGE_R + 11, angle);
+    const inner = polarToXY(GAUGE_CX, GAUGE_CY, GAUGE_R + 2, angle);
+    const labelPos = polarToXY(GAUGE_CX, GAUGE_CY, GAUGE_R + 24, angle);
+    const isRed = d <= 2;
+    ticksHtml += `<line x1="${inner.x}" y1="${inner.y}" x2="${outer.x}" y2="${outer.y}" stroke="${isRed ? '#e64b3c' : 'rgba(255,255,255,0.55)'}" stroke-width="2"/>`;
+    ticksHtml += `<text x="${labelPos.x}" y="${labelPos.y}" font-size="9" fill="${isRed ? '#e64b3c' : 'rgba(255,255,255,0.6)'}" text-anchor="middle" dominant-baseline="middle" font-weight="700">${d}</text>`;
+  }
+  ticksG.innerHTML = ticksHtml;
+}
+
+function updateGauge(daysRemainingFloat) {
+  const angle = daysToAngle(daysRemainingFloat);
+  const tip = polarToXY(GAUGE_CX, GAUGE_CY, 75, angle);
+  const needle = document.getElementById('tacho-needle');
+  needle.setAttribute('x2', tip.x);
+  needle.setAttribute('y2', tip.y);
+
+  const wholeDays = Math.ceil(daysRemainingFloat);
+  const label = document.getElementById('gauge-days-label');
+  const inRedline = daysRemainingFloat <= 2;
+  label.textContent = daysRemainingFloat <= 0 ? 'Trip day!' : (wholeDays + (wholeDays === 1 ? ' day' : ' days'));
+  label.className = 'gauge-big-label ' + (inRedline ? 'redline' : 'normal');
+  needle.setAttribute('stroke', inRedline ? '#ff6b5e' : '#f2c14e');
+}
+
+initGauge();
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = CHECK_IN - now;
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML = '<div style="width:100%;text-align:center;font-weight:700;color:var(--sand);padding:8px 0;">We\'re at Chatfield! 🏕️</div>';
+    updateGauge(0);
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = hours;
+  document.getElementById('cd-mins').textContent = mins;
+  document.getElementById('cd-secs').textContent = secs;
+  updateGauge(diff / 86400000);
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ---- Data load ----
+async function loadData() {
+  try {
+    const res = await fetch('/api/data');
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    tripData = await res.json();
+    if (!tripData.events) tripData.events = [];
+    if (!tripData.restaurants) tripData.restaurants = [];
+    if (!tripData.links) tripData.links = [];
+    if (!tripData.packing) tripData.packing = [];
+    renderRestaurants();
+    renderLinks();
+    renderPacking();
+    renderCalendar();
+  } catch (e) {
+    console.error('Failed to load data', e);
+    const errMsg = '<div class="empty-state">Couldn\'t load trip data. Pull to refresh or check your connection.</div>';
+    document.getElementById('restaurant-list').innerHTML = errMsg;
+    document.getElementById('links-list').innerHTML = errMsg;
+    document.getElementById('packing-list').innerHTML = errMsg;
+    document.getElementById('calendar-list').innerHTML = errMsg;
+  }
+}
+loadData();
+setInterval(loadData, 30000);
+
+// ---- Restaurants ----
+document.getElementById('filter-row').addEventListener('click', (e) => {
+  if (!e.target.classList.contains('filter-chip')) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  currentFilter = e.target.dataset.filter;
+  renderRestaurants();
+});
+
+function renderRestaurants() {
+  const list = document.getElementById('restaurant-list');
+  let items = tripData.restaurants || [];
+  if (currentFilter !== 'All') items = items.filter(r => r.category === currentFilter);
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state">No places yet in this category.</div>';
+    return;
+  }
+  items = [...items].sort((a,b) => (b.rating||0) - (a.rating||0));
+  list.innerHTML = items.map(r => `
+    <div class="place-card">
+      <div class="place-top">
+        <div class="place-name">${escapeHtml(r.name)}</div>
+        <div class="place-cat cat-${cssCat(r.category)}">${r.category}</div>
+      </div>
+      ${r.notes ? `<div class="place-notes">${escapeHtml(r.notes)}</div>` : ''}
+      <div class="place-meta">
+        <span>${r.rating ? '<span class="place-rating">★ ' + r.rating + '</span>' : 'Added by ' + escapeHtml(r.addedBy || 'Guest')}</span>
+        ${r.addedBy === 'Seed' ? '' : `<button class="del-btn" onclick="deleteRestaurant('${r.id}')">Remove</button>`}
+      </div>
+    </div>
+  `).join('');
+}
+function cssCat(c) { return c.replace('/', '\\/'); }
+
+async function addRestaurant() {
+  const name = document.getElementById('r-name').value.trim();
+  const category = document.getElementById('r-category').value;
+  const notes = document.getElementById('r-notes').value.trim();
+  const addedBy = document.getElementById('r-addedby').value.trim() || 'Guest';
+  if (!name) return alert('Please enter a name');
+  const res = await fetch('/api/restaurants', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, category, notes, addedBy })
+  });
+  const item = await res.json();
+  tripData.restaurants.push(item);
+  document.getElementById('r-name').value = '';
+  document.getElementById('r-notes').value = '';
+  renderRestaurants();
+}
+
+async function deleteRestaurant(id) {
+  await fetch('/api/restaurants/' + id, { method: 'DELETE' });
+  tripData.restaurants = tripData.restaurants.filter(r => r.id !== id);
+  renderRestaurants();
+}
+
+// ---- Links ----
+function renderLinks() {
+  const list = document.getElementById('links-list');
+  const items = tripData.links || [];
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state">No links yet.</div>';
+    return;
+  }
+  list.innerHTML = items.map(l => `
+    <div style="position:relative;">
+      <a class="link-card" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">
+        <div class="link-left">
+          <div class="link-label">${escapeHtml(l.label)}</div>
+          ${l.notes ? `<div class="link-notes">${escapeHtml(l.notes)}</div>` : ''}
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+  `).join('');
+}
+
+async function addLink() {
+  const label = document.getElementById('l-label').value.trim();
+  let url = document.getElementById('l-url').value.trim();
+  const notes = document.getElementById('l-notes').value.trim();
+  if (!label || !url) return alert('Please enter a label and URL');
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const res = await fetch('/api/links', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ label, url, notes })
+  });
+  const item = await res.json();
+  tripData.links.push(item);
+  document.getElementById('l-label').value = '';
+  document.getElementById('l-url').value = '';
+  document.getElementById('l-notes').value = '';
+  renderLinks();
+}
+
+// ---- Packing ----
+function renderPacking() {
+  const list = document.getElementById('packing-list');
+  const items = tripData.packing || [];
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state">Nothing on the list yet — add the first item below.</div>';
+    return;
+  }
+  list.innerHTML = items.map(p => `
+    <div class="pack-item ${p.checked ? 'checked' : ''}">
+      <input type="checkbox" ${p.checked ? 'checked' : ''} onchange="togglePacking('${p.id}', this.checked)">
+      <div class="txt">${escapeHtml(p.item)}</div>
+      <span class="pack-badge">${escapeHtml(p.addedBy)}</span>
+      <button class="del-btn" onclick="deletePacking('${p.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+async function addPacking() {
+  const item = document.getElementById('p-item').value.trim();
+  const addedBy = document.getElementById('p-addedby').value.trim() || 'Guest';
+  if (!item) return;
+  const res = await fetch('/api/packing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item, addedBy })
+  });
+  const newItem = await res.json();
+  tripData.packing.push(newItem);
+  document.getElementById('p-item').value = '';
+  renderPacking();
+}
+
+async function togglePacking(id, checked) {
+  await fetch('/api/packing/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ checked })
+  });
+  const p = tripData.packing.find(x => x.id === id);
+  if (p) p.checked = checked;
+  renderPacking();
+}
+
+async function deletePacking(id) {
+  await fetch('/api/packing/' + id, { method: 'DELETE' });
+  tripData.packing = tripData.packing.filter(p => p.id !== id);
+  renderPacking();
+}
+
+// ---- Calendar ----
+const TRIP_START = '2026-08-12';
+const TRIP_END = '2026-08-23';
+const DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function tripDayList() {
+  const days = [];
+  let d = new Date(TRIP_START + 'T12:00:00');
+  const end = new Date(TRIP_END + 'T12:00:00');
+  while (d <= end) {
+    days.push(d.toISOString().slice(0, 10));
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+function renderCalendar() {
+  const list = document.getElementById('calendar-list');
+  const events = tripData.events || [];
+  const days = tripDayList();
+  list.innerHTML = days.map(dateStr => {
+    const d = new Date(dateStr + 'T12:00:00');
+    const dayEvents = events.filter(e => e.date === dateStr);
+    return `
+      <div class="day-row ${dayEvents.length ? 'has-events' : ''}">
+        <div class="day-date">
+          <div class="dow">${DOW_NAMES[d.getDay()]}</div>
+          <div class="dom">${d.getDate()}</div>
+        </div>
+        <div class="day-body">
+          ${dayEvents.length ? `
+            <div class="day-events">
+              ${dayEvents.map(e => `
+                <div class="event-chip">
+                  <div class="event-title">${escapeHtml(e.title)}</div>
+                  ${e.notes ? `<div class="event-notes">${escapeHtml(e.notes)}</div>` : ''}
+                  <div class="event-meta">
+                    <span>${e.addedBy === 'Seed' ? '' : 'Added by ' + escapeHtml(e.addedBy)}</span>
+                    ${e.addedBy === 'Seed' ? '' : `<button class="del-btn" onclick="deleteEvent('${e.id}')">Remove</button>`}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : `<div class="day-empty">Nothing planned</div>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function addEvent() {
+  const date = document.getElementById('e-date').value;
+  const title = document.getElementById('e-title').value.trim();
+  const notes = document.getElementById('e-notes').value.trim();
+  const addedBy = document.getElementById('e-addedby').value.trim() || 'Guest';
+  if (!date || !title) return alert('Please pick a date and enter what happened');
+  const res = await fetch('/api/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ date, title, notes, addedBy })
+  });
+  const item = await res.json();
+  tripData.events.push(item);
+  document.getElementById('e-title').value = '';
+  document.getElementById('e-notes').value = '';
+  renderCalendar();
+}
+
+async function deleteEvent(id) {
+  await fetch('/api/events/' + id, { method: 'DELETE' });
+  tripData.events = tripData.events.filter(e => e.id !== id);
+  renderCalendar();
+}
+
+// ---- Weather (Open-Meteo, no key needed) ----
+const CHATFIELD_LAT = 39.5453;
+const CHATFIELD_LON = -105.0644;
+const WEATHER_ICONS = {
+  0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+  45: '🌫️', 48: '🌫️',
+  51: '🌦️', 53: '🌦️', 55: '🌧️',
+  61: '🌦️', 63: '🌧️', 65: '🌧️',
+  71: '🌨️', 73: '🌨️', 75: '❄️',
+  80: '🌦️', 81: '🌧️', 82: '⛈️',
+  95: '⛈️', 96: '⛈️', 99: '⛈️'
+};
+function iconFor(code) { return WEATHER_ICONS[code] || '🌡️'; }
+function descFor(code) {
+  const map = {0:'Clear sky',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Foggy',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Violent showers',95:'Thunderstorm',96:'Thunderstorm',99:'Severe thunderstorm'};
+  return map[code] || 'Weather';
+}
+
+async function loadWeather() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${CHATFIELD_LAT}&longitude=${CHATFIELD_LON}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDenver&forecast_days=10`;
+    const res = await fetch(url);
+    const data = await res.json();
+    renderWeather(data);
+  } catch (e) {
+    document.getElementById('weather-content').innerHTML = '<div class="empty-state">Couldn\'t load weather right now.</div>';
+  }
+}
+
+function renderWeather(data) {
+  const cur = data.current;
+  const daily = data.daily;
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = `
+    <div class="weather-current">
+      <div>
+        <div class="weather-temp">${Math.round(cur.temperature_2m)}°</div>
+        <div class="weather-desc">${descFor(cur.weather_code)} · Wind ${Math.round(cur.wind_speed_10m)} mph</div>
+      </div>
+      <div class="weather-icon">${iconFor(cur.weather_code)}</div>
+    </div>
+    <div class="forecast-scroll">
+  `;
+  for (let i = 0; i < daily.time.length; i++) {
+    const d = new Date(daily.time[i] + 'T12:00:00');
+    html += `
+      <div class="fday">
+        <div class="fname">${i === 0 ? 'Today' : dayNames[d.getDay()]}</div>
+        <div class="ficon">${iconFor(daily.weather_code[i])}</div>
+        <div class="fhi">${Math.round(daily.temperature_2m_max[i])}°</div>
+        <div class="flo">${Math.round(daily.temperature_2m_min[i])}°</div>
+      </div>
+    `;
+  }
+  html += '</div>';
+  document.getElementById('weather-content').innerHTML = html;
+}
+loadWeather();
+setInterval(loadWeather, 15 * 60 * 1000);
+
+// ---- Utils ----
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(str) { return escapeHtml(str); }
+</script>
+
+</body>
+</html>

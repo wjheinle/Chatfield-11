@@ -1,0 +1,9 @@
+{
+  "name": "Chatfield 2026",
+  "short_name": "Chatfield",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#142a20",
+  "theme_color": "#1f3d2e",
+  "icons": []
+}
