@@ -14,39 +14,32 @@ if (!fs.existsSync(DATA_DIR)) {
 
 const DEFAULTS = {
   restaurants: [
-    { id: 'r1', name: 'The Lake House Kitchen & Tavern', category: 'Restaurant', notes: 'Lake views, patio dining, dog-friendly patio', addedBy: 'Seed', rating: 4.4, lat: 39.6091987, lng: -105.085005, menuUrl: 'https://lakehousekt.com/menu' },
-    { id: 'r2', name: 'Seagull\'s Restaurant', category: 'Restaurant', notes: 'Right at Chatfield Marina — closest option, counter service, lake/mountain views', addedBy: 'Seed', rating: 4.5, lat: 39.544061, lng: -105.0608381, menuUrl: 'https://chatfield-marina.com/seagulls-restaurant/' },
-    { id: 'r3', name: 'Farm House Restaurant at Breckenridge Brewery', category: 'Brewery', notes: 'Outdoor beer garden, stage, games', addedBy: 'Seed', rating: 4.5, lat: 39.5936492, lng: -105.02503019999999, menuUrl: 'https://breckbrewpub.com/menu/dinner' },
-    { id: 'r4', name: 'Breckenridge Brewery', category: 'Brewery', notes: 'Along the river/bike trail, pet friendly', addedBy: 'Seed', rating: 4.3, lat: 39.5935813, lng: -105.0250782, menuUrl: 'https://breckbrewpub.com/menu/dinner' },
-    { id: 'r5', name: 'Angelo\'s Taverna - Littleton', category: 'Restaurant', notes: 'Italian, wood-fired pizza, oysters, popular', addedBy: 'Seed', rating: 4.6, lat: 39.5921999, lng: -105.0228161, menuUrl: 'https://angelostaverna.com/littleton-location' },
-    { id: 'r6', name: 'Lariat Lodge Brewing Company', category: 'Brewery', notes: 'Burgers, big beer list, deck', addedBy: 'Seed', rating: 4.4, lat: 39.5795146, lng: -105.1404369, menuUrl: 'https://lariatlodgebrewing.com/littleton-food/' },
-    { id: 'r7', name: 'Homegrown Tap & Dough', category: 'Restaurant', notes: 'Pizza, arcade room, family friendly', addedBy: 'Seed', rating: 4.6, lat: 39.5790931, lng: -105.1384082, menuUrl: 'https://www.tapanddough.com/menus/' },
-    { id: 'r8', name: 'Cafe Terracotta', category: 'Coffee/Cafe', notes: 'Coffee + full dinner menu, cozy historic building', addedBy: 'Seed', rating: 4.6, lat: 39.6147285, lng: -105.0186864, menuUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJS1p27jKAbIcRhyVrpIoFBkw' },
-    { id: 'r9', name: 'Enchanted Grounds', category: 'Coffee/Cafe', notes: 'Coffee shop with games, breakfast burritos', addedBy: 'Seed', rating: 4.6, lat: 39.609959, lng: -105.034867, menuUrl: 'https://enchantedgrounds.com/pages/cafe-menu' },
-    { id: 'r10', name: 'Lost Coffee (Littleton Blvd)', category: 'Coffee/Cafe', notes: 'Great lattes, patio, dog friendly', addedBy: 'Seed', rating: 4.8, lat: 39.6129021, lng: -105.0017914, menuUrl: 'https://www.lostcoffee.com/pages/littleton' },
-    { id: 'r11', name: 'Hearth Bakery & Cafe', category: 'Coffee/Cafe', notes: 'Bakery, breakfast sandwiches, dog friendly patio', addedBy: 'Seed', rating: 4.7, lat: 39.6150164, lng: -105.0181407, menuUrl: 'https://www.hearthdenver.com/' },
-    { id: 'r12', name: 'Zymos Brewing', category: 'Brewery', notes: 'Small neighborhood brewery, highly rated', addedBy: 'Seed', rating: 4.9, lat: 39.6229785, lng: -105.0345956, menuUrl: 'https://www.zymosbrewing.com/' },
-    { id: 'r13', name: 'Littleton Brewing Company', category: 'Brewery', notes: 'Rooftop patio, sunset views, karaoke nights', addedBy: 'Seed', rating: 4.6, lat: 39.613533, lng: -105.002058, menuUrl: 'https://www.littletonbrewco.com/foodmenu' },
-    { id: 'r14', name: 'Comet Brews', category: 'Brewery', notes: 'Small batch, cozy, downtown Littleton', addedBy: 'Seed', rating: 4.6, lat: 39.6144319, lng: -105.0148134, menuUrl: 'https://cometbrews.com/' },
-    { id: 'r15', name: 'Coal Mine Ave Brewing Company', category: 'Brewery', notes: 'Dog park on site, food trucks', addedBy: 'Seed', rating: 4.5, lat: 39.5962829, lng: -105.1068649, menuUrl: 'https://coalmineavebrewing.com/menu' },
-    { id: 'r16', name: 'Locavore Beer Works', category: 'Brewery', notes: 'Pinball, BBQ + Italian food delivery to table', addedBy: 'Seed', rating: 4.7, lat: 39.6088021, lng: -105.0362009, menuUrl: 'https://taplist.io/locavorebeerworks' },
-    { id: 'r17', name: 'Waterton Tavern', category: 'Restaurant', notes: 'Near Roxborough State Park, wings, pinball', addedBy: 'Seed', rating: 4.3, lat: 39.4845617, lng: -105.0748741, menuUrl: 'https://watertontavern.com/food-menu' },
-    { id: 'r18', name: 'NoNo\'s Cafe', category: 'Restaurant', notes: 'Cajun/Creole, brunch, gumbo', addedBy: 'Seed', rating: 4.6, lat: 39.5665804, lng: -105.0267587, menuUrl: 'https://nonoscafe.com/signature-menu/' },
-    { id: 'r19', name: 'Smokin Fins - Highlands Ranch', category: 'Restaurant', notes: 'Seafood + sushi, oysters, patio', addedBy: 'Seed', rating: 4.4, lat: 39.548304, lng: -105.0013667, menuUrl: 'https://www.smokinfinsrestaurant.com/highlandsranch' },
-    { id: 'r20', name: 'Lazy Dog Restaurant & Bar', category: 'Restaurant', notes: 'Big American menu, late hours, patio', addedBy: 'Seed', rating: 4.5, lat: 39.5626642, lng: -104.988466, menuUrl: 'https://orders.lazydogrestaurants.com/menu' },
-    { id: 'r21', name: 'Atlas Coffee | Salta', category: 'Coffee/Cafe', notes: 'Sterling Ranch, big open space with full bar too', addedBy: 'Seed', rating: 4.4, lat: 39.5068255, lng: -105.0371524, menuUrl: 'https://www.atlascoffees.com/menu-1' },
-    { id: 'r22', name: 'Living The Dream Taproom at Sterling Ranch', category: 'Brewery', notes: 'Craft beer taproom, easy Sterling Ranch location', addedBy: 'Seed', rating: 4.4, lat: 39.5068136, lng: -105.0374517, menuUrl: 'https://livingthedreambrewing.com/' },
-    { id: 'r23', name: 'JP\'s Asian Bistro', category: 'Restaurant', notes: 'Roxborough Park area, Chinese classics + sushi, over 20 years local', addedBy: 'Seed', rating: 4.5, lat: 39.4829256, lng: -105.0740349, menuUrl: 'https://jpsasianbistro.getbento.com/online-ordering/jps-asian-bistro/menu' },
-    { id: 'r24', name: 'Rosa Mexican Kitchen', category: 'Restaurant', notes: 'Roxborough Park area, fresh/authentic, grab-and-go style', addedBy: 'Seed', rating: 4.5, lat: 39.4830223, lng: -105.0742359, menuUrl: 'https://rosa-mexican-kitchen-littletonco.cloveronline.com/menu/all' }
+    { id: 'r1', name: 'Seagull\'s Restaurant', category: 'Restaurant', notes: 'Right at Chatfield Marina — closest option, counter service, lake/mountain views', addedBy: 'Seed', rating: null, lat: 39.54447126161328, lng: -105.0608122927029, menuUrl: 'http://chatfield-marina.com/', isGoldenTee: false },
+    { id: 'r2', name: 'Atlas Coffee | Salta', category: 'Coffee/Cafe', notes: '', addedBy: 'Seed', rating: null, lat: 39.506880873514554, lng: -105.03712334522874, menuUrl: 'http://www.atlascoffees.com/menu-1', isGoldenTee: false },
+    { id: 'r3', name: 'Living The Dream Taproom at Sterling Ranch', category: 'Brewery', notes: '', addedBy: 'Seed', rating: null, lat: 39.50687399209698, lng: -105.0374366145683, menuUrl: 'https://livingthedreambrewing.com/', isGoldenTee: false },
+    { id: 'r4', name: 'Waterton Tavern', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.48468032611802, lng: -105.07488057613945, menuUrl: 'http://www.watertontavern.com/', isGoldenTee: true },
+    { id: 'r5', name: 'Starbucks', category: 'Coffee/Cafe', notes: '', addedBy: 'Seed', rating: null, lat: 39.48500006678508, lng: -105.07463199200244, menuUrl: 'https://www.starbucks.com', isGoldenTee: false },
+    { id: 'r6', name: 'JP\'s Asian Bistro', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.48304289734905, lng: -105.07401285695921, menuUrl: 'https://jpsasianbistro.getbento.com/online-ordering/jps-asian-bistro/menu', isGoldenTee: false },
+    { id: 'r7', name: 'Domino\'s', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.48345795163097, lng: -105.07537315801693, menuUrl: 'https://www.dominos.com/en/?utm_source=google&utm_medium=loclist&utm_campaign=localmaps', isGoldenTee: false },
+    { id: 'r8', name: 'Asian Spice', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.56689616352093, lng: -105.08095147584837, menuUrl: 'http://asianspicelittleton.com/', isGoldenTee: false },
+    { id: 'r9', name: 'Hogback BBQ & Grill', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.57364116542723, lng: -105.05606141703639, menuUrl: 'https://hogbackbbq.com/littleton-hogback-bbq-and-grill-food-menu', isGoldenTee: false },
+    { id: 'r10', name: 'Texas Roadhouse', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.563007944945134, lng: -105.11196702941392, menuUrl: 'https://www.texasroadhouse.com/location/170-littletonco/detail/action/waitlist', isGoldenTee: false },
+    { id: 'r11', name: 'Wide Open Saloon', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.43891981941245, lng: -104.96151111507154, menuUrl: 'http://wideopensaloon.com/', isGoldenTee: false },
+    { id: 'r12', name: 'Bud\'s Bar', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.437473215315116, lng: -104.96266491092057, menuUrl: 'https://buds-cafe-bar.placeid.site/', isGoldenTee: false },
+    { id: 'r13', name: 'O\'Brien\'s Cafe', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.43815851608194, lng: -104.95892289659376, menuUrl: null, isGoldenTee: false },
+    { id: 'r14', name: 'El Mesón | Mexican Restaurant', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.54738778043553, lng: -105.03440921061029, menuUrl: 'https://mesonhighlandsranch.com/menu/', isGoldenTee: false },
+    { id: 'r15', name: 'Platte River Bar and Grill', category: 'Restaurant', notes: '', addedBy: 'Seed', rating: null, lat: 39.607878670776586, lng: -105.02145459868441, menuUrl: 'http://www.theplatteriverbarandgrill.com/', isGoldenTee: true },
+    { id: 'r16', name: 'Breckenridge Brewery', category: 'Brewery', notes: '', addedBy: 'Seed', rating: null, lat: 39.59366279976414, lng: -105.02510768038447, menuUrl: 'https://www.breckbrew.com/visit/littleton/food/', isGoldenTee: false }
   ],
   links: [
     { id: 'l1', label: 'Chatfield State Park (CPW)', url: 'https://cpw.state.co.us/placestogo/parks/Chatfield', notes: 'Official park info, alerts, camping rules' },
-    { id: 'l2', label: 'Chatfield Reservoir Lake Levels / Water Data', url: 'https://dwr.state.co.us/Tools/Stations', notes: 'CO Division of Water Resources gauge data' },
+    { id: 'l2', label: 'Chatfield Reservoir Lake Levels', url: 'https://dwr.state.co.us/Tools/Stations/CHARESCO?params=ELEV', notes: 'CO Division of Water Resources — live gauge data for Chatfield' },
     { id: 'l3', label: 'Chatfield Marina', url: 'https://www.chatfieldmarina.com/', notes: 'Boat ramp status, fuel, rentals' },
     { id: 'l4', label: 'NOAA Weather - Chatfield/Littleton', url: 'https://forecast.weather.gov/', notes: 'Detailed hourly forecast' },
     { id: 'l5', label: 'Windy.com (wind/marine)', url: 'https://www.windy.com/', notes: 'Good for boating wind conditions' },
     { id: 'l6', label: 'CPW Camping Reservations', url: 'https://cpw.state.co.us/camping', notes: 'Reservation portal / site info' },
-    { id: 'l7', label: 'Google Maps - Chatfield State Park', url: 'https://www.google.com/maps/place/Chatfield+State+Park', notes: 'Directions, campground map' }
+    { id: 'l7', label: 'Google Maps - Chatfield State Park', url: 'https://www.google.com/maps/place/Chatfield+State+Park', notes: 'Directions, campground map' },
+    { id: 'l8', label: 'Golden Tee Locations', url: 'https://livewire.itsgames.com/find_a_game', notes: 'Find nearby Golden Tee machines — Waterton Tavern & Platte River Bar and Grill both have one' }
   ],
   packing: [],
   events: [
@@ -92,31 +85,74 @@ function loadData() {
       }
     }
 
-    // Backfill lat/lng and menuUrl onto previously-seeded restaurants that
-    // predate those fields, matched by id, without touching guest-added entries.
+    // ONE-TIME RESEED (2026-08-03): the restaurant list was fully replaced with
+    // Bill's curated spreadsheet, and the same r1..r16 ids now point at different
+    // places than before. Detect the stale, pre-reseed dataset by its old
+    // signature (it never had isGoldenTee) and replace seeded rows wholesale —
+    // but keep every guest-added restaurant (non-'Seed' addedBy) exactly as is.
     if (Array.isArray(parsed.restaurants)) {
-      const defaultsById = {};
-      for (const d of DEFAULTS.restaurants) defaultsById[d.id] = d;
-      for (const r of parsed.restaurants) {
-        const seedMatch = defaultsById[r.id];
-        if (seedMatch && (r.lat === undefined || r.lat === null) && typeof seedMatch.lat === 'number') {
-          r.lat = seedMatch.lat;
-          r.lng = seedMatch.lng;
-          changed = true;
+      const looksLikeOldSeed = parsed.restaurants.some(
+        r => r.addedBy === 'Seed' && r.isGoldenTee === undefined
+      );
+      if (looksLikeOldSeed) {
+        const guestKept = parsed.restaurants.filter(r => r.addedBy !== 'Seed');
+        parsed.restaurants = [...JSON.parse(JSON.stringify(DEFAULTS.restaurants)), ...guestKept];
+        changed = true;
+        console.log(`Reseeded restaurants list (old seed detected) — kept ${guestKept.length} guest-added place(s)`);
+      } else {
+        // Already on the current seed generation — just backfill any fields
+        // that predate a later field addition, matched by id, without
+        // touching guest-added entries.
+        const defaultsById = {};
+        for (const d of DEFAULTS.restaurants) defaultsById[d.id] = d;
+        for (const r of parsed.restaurants) {
+          if (r.addedBy !== 'Seed') continue;
+          const seedMatch = defaultsById[r.id];
+          if (!seedMatch) continue;
+          if ((r.lat === undefined || r.lat === null) && typeof seedMatch.lat === 'number') {
+            r.lat = seedMatch.lat;
+            r.lng = seedMatch.lng;
+            changed = true;
+          }
+          if (!r.menuUrl && seedMatch.menuUrl) {
+            r.menuUrl = seedMatch.menuUrl;
+            changed = true;
+          }
+          if (r.isGoldenTee === undefined) {
+            r.isGoldenTee = !!seedMatch.isGoldenTee;
+            changed = true;
+          }
         }
-        if (seedMatch && !r.menuUrl && seedMatch.menuUrl) {
-          r.menuUrl = seedMatch.menuUrl;
+        const existingIds = new Set(parsed.restaurants.map(r => r.id));
+        for (const d of DEFAULTS.restaurants) {
+          if (!existingIds.has(d.id)) {
+            parsed.restaurants.push(JSON.parse(JSON.stringify(d)));
+            changed = true;
+            console.log(`Added new seed restaurant "${d.name}"`);
+          }
+        }
+      }
+    }
+
+    // Also refresh links whose id/label matches a known seed link but whose
+    // URL is stale (e.g. the lake-level link narrowed to the Chatfield gauge).
+    if (Array.isArray(parsed.links)) {
+      const defaultLinksById = {};
+      for (const d of DEFAULTS.links) defaultLinksById[d.id] = d;
+      for (const l of parsed.links) {
+        const seedMatch = defaultLinksById[l.id];
+        if (seedMatch && l.url !== seedMatch.url && l.label === seedMatch.label) {
+          l.url = seedMatch.url;
+          l.notes = seedMatch.notes;
           changed = true;
         }
       }
-      // Add any brand-new seed restaurants (e.g. r21+) that aren't in the
-      // deployed data yet, without duplicating or touching existing entries.
-      const existingIds = new Set(parsed.restaurants.map(r => r.id));
-      for (const d of DEFAULTS.restaurants) {
-        if (!existingIds.has(d.id)) {
-          parsed.restaurants.push(JSON.parse(JSON.stringify(d)));
+      const existingLinkIds = new Set(parsed.links.map(l => l.id));
+      for (const d of DEFAULTS.links) {
+        if (!existingLinkIds.has(d.id)) {
+          parsed.links.push(JSON.parse(JSON.stringify(d)));
           changed = true;
-          console.log(`Added new seed restaurant "${d.name}"`);
+          console.log(`Added new seed link "${d.label}"`);
         }
       }
     }
@@ -148,7 +184,7 @@ app.get('/api/data', (req, res) => {
 });
 
 app.post('/api/restaurants', (req, res) => {
-  const { name, category, notes, addedBy, lat, lng, menuUrl } = req.body;
+  const { name, category, notes, addedBy, lat, lng, menuUrl, isGoldenTee } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   const item = {
     id: 'r' + Date.now(),
@@ -159,7 +195,8 @@ app.post('/api/restaurants', (req, res) => {
     rating: null,
     lat: typeof lat === 'number' ? lat : null,
     lng: typeof lng === 'number' ? lng : null,
-    menuUrl: typeof menuUrl === 'string' && menuUrl.trim() ? menuUrl.trim() : null
+    menuUrl: typeof menuUrl === 'string' && menuUrl.trim() ? menuUrl.trim() : null,
+    isGoldenTee: !!isGoldenTee
   };
   cache.restaurants.push(item);
   saveData(cache);
@@ -169,8 +206,9 @@ app.post('/api/restaurants', (req, res) => {
 app.put('/api/restaurants/:id', (req, res) => {
   const r = cache.restaurants.find(x => x.id === req.params.id);
   if (!r) return res.status(404).json({ error: 'not found' });
-  const { menuUrl } = req.body;
+  const { menuUrl, isGoldenTee } = req.body;
   if (typeof menuUrl === 'string') r.menuUrl = menuUrl.trim() || null;
+  if (typeof isGoldenTee === 'boolean') r.isGoldenTee = isGoldenTee;
   saveData(cache);
   res.json(r);
 });

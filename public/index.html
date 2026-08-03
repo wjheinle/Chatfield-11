@@ -237,6 +237,17 @@
     margin-right: 2px;
     vertical-align: middle;
   }
+  .gt-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    color: #1f6b2f;
+    background: #e2f3e2;
+    padding: 2px 6px;
+    border-radius: 6px;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
 
   .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
   .filter-chip {
@@ -818,7 +829,8 @@ function updateEatsMapMarkers(items) {
       ? `${r._driveMins.toFixed(0)} min drive (${r._driveMiles.toFixed(1)} mi)`
       : (r._dist != null ? r._dist.toFixed(1) + ' mi (straight-line)' : '');
     const menuLink = r.menuUrl ? `<br><a href="${escapeAttr(r.menuUrl)}" target="_blank" rel="noopener">View Menu</a>` : '';
-    marker.bindPopup(`<b>${escapeHtml(r.name)}</b><br>${r.category}${distText ? '<br>' + distText : ''}${menuLink}`);
+    const gtTag = r.isGoldenTee ? ' · ⛳ Golden Tee' : '';
+    marker.bindPopup(`<b>${escapeHtml(r.name)}</b><br>${r.category}${gtTag}${distText ? '<br>' + distText : ''}${menuLink}`);
     eatsMapMarkers.push(marker);
   });
 }
@@ -860,7 +872,7 @@ function renderRestaurants() {
     return `
     <div class="place-card">
       <div class="place-top">
-        <div class="place-name">${typeof r.lat === 'number' ? `<span class="map-num-badge">${i+1}</span> ` : ''}${escapeHtml(r.name)}</div>
+        <div class="place-name">${typeof r.lat === 'number' ? `<span class="map-num-badge">${i+1}</span> ` : ''}${escapeHtml(r.name)}${r.isGoldenTee ? ' <span class="gt-badge" title="Golden Tee machine on site">⛳ GT</span>' : ''}</div>
         <div class="place-cat cat-${cssCat(r.category)}">${r.category}</div>
       </div>
       ${r.notes ? `<div class="place-notes">${escapeHtml(r.notes)}</div>` : ''}
