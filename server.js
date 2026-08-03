@@ -14,26 +14,30 @@ if (!fs.existsSync(DATA_DIR)) {
 
 const DEFAULTS = {
   restaurants: [
-    { id: 'r1', name: 'The Lake House Kitchen & Tavern', category: 'Restaurant', notes: 'Lake views, patio dining, dog-friendly patio', addedBy: 'Seed', rating: 4.4, lat: 39.6091987, lng: -105.085005 },
-    { id: 'r2', name: 'Seagull\'s Restaurant', category: 'Restaurant', notes: 'Right at Chatfield Marina — closest option, counter service, lake/mountain views', addedBy: 'Seed', rating: 4.5, lat: 39.544061, lng: -105.0608381 },
-    { id: 'r3', name: 'Farm House Restaurant at Breckenridge Brewery', category: 'Brewery', notes: 'Outdoor beer garden, stage, games', addedBy: 'Seed', rating: 4.5, lat: 39.5936492, lng: -105.02503019999999 },
-    { id: 'r4', name: 'Breckenridge Brewery', category: 'Brewery', notes: 'Along the river/bike trail, pet friendly', addedBy: 'Seed', rating: 4.3, lat: 39.5935813, lng: -105.0250782 },
-    { id: 'r5', name: 'Angelo\'s Taverna - Littleton', category: 'Restaurant', notes: 'Italian, wood-fired pizza, oysters, popular', addedBy: 'Seed', rating: 4.6, lat: 39.5921999, lng: -105.0228161 },
-    { id: 'r6', name: 'Lariat Lodge Brewing Company', category: 'Brewery', notes: 'Burgers, big beer list, deck', addedBy: 'Seed', rating: 4.4, lat: 39.5795146, lng: -105.1404369 },
-    { id: 'r7', name: 'Homegrown Tap & Dough', category: 'Restaurant', notes: 'Pizza, arcade room, family friendly', addedBy: 'Seed', rating: 4.6, lat: 39.5790931, lng: -105.1384082 },
-    { id: 'r8', name: 'Cafe Terracotta', category: 'Coffee/Cafe', notes: 'Coffee + full dinner menu, cozy historic building', addedBy: 'Seed', rating: 4.6, lat: 39.6147285, lng: -105.0186864 },
-    { id: 'r9', name: 'Enchanted Grounds', category: 'Coffee/Cafe', notes: 'Coffee shop with games, breakfast burritos', addedBy: 'Seed', rating: 4.6, lat: 39.609959, lng: -105.034867 },
-    { id: 'r10', name: 'Lost Coffee (Littleton Blvd)', category: 'Coffee/Cafe', notes: 'Great lattes, patio, dog friendly', addedBy: 'Seed', rating: 4.8, lat: 39.6129021, lng: -105.0017914 },
-    { id: 'r11', name: 'Hearth Bakery & Cafe', category: 'Coffee/Cafe', notes: 'Bakery, breakfast sandwiches, dog friendly patio', addedBy: 'Seed', rating: 4.7, lat: 39.6150164, lng: -105.0181407 },
-    { id: 'r12', name: 'Zymos Brewing', category: 'Brewery', notes: 'Small neighborhood brewery, highly rated', addedBy: 'Seed', rating: 4.9, lat: 39.6229785, lng: -105.0345956 },
-    { id: 'r13', name: 'Littleton Brewing Company', category: 'Brewery', notes: 'Rooftop patio, sunset views, karaoke nights', addedBy: 'Seed', rating: 4.6, lat: 39.613533, lng: -105.002058 },
-    { id: 'r14', name: 'Comet Brews', category: 'Brewery', notes: 'Small batch, cozy, downtown Littleton', addedBy: 'Seed', rating: 4.6, lat: 39.6144319, lng: -105.0148134 },
-    { id: 'r15', name: 'Coal Mine Ave Brewing Company', category: 'Brewery', notes: 'Dog park on site, food trucks', addedBy: 'Seed', rating: 4.5, lat: 39.5962829, lng: -105.1068649 },
-    { id: 'r16', name: 'Locavore Beer Works', category: 'Brewery', notes: 'Pinball, BBQ + Italian food delivery to table', addedBy: 'Seed', rating: 4.7, lat: 39.6088021, lng: -105.0362009 },
-    { id: 'r17', name: 'Waterton Tavern', category: 'Restaurant', notes: 'Near Roxborough State Park, wings, pinball', addedBy: 'Seed', rating: 4.3, lat: 39.4845617, lng: -105.0748741 },
-    { id: 'r18', name: 'NoNo\'s Cafe', category: 'Restaurant', notes: 'Cajun/Creole, brunch, gumbo', addedBy: 'Seed', rating: 4.6, lat: 39.5665804, lng: -105.0267587 },
-    { id: 'r19', name: 'Smokin Fins - Highlands Ranch', category: 'Restaurant', notes: 'Seafood + sushi, oysters, patio', addedBy: 'Seed', rating: 4.4, lat: 39.548304, lng: -105.0013667 },
-    { id: 'r20', name: 'Lazy Dog Restaurant & Bar', category: 'Restaurant', notes: 'Big American menu, late hours, patio', addedBy: 'Seed', rating: 4.5, lat: 39.5626642, lng: -104.988466 }
+    { id: 'r1', name: 'The Lake House Kitchen & Tavern', category: 'Restaurant', notes: 'Lake views, patio dining, dog-friendly patio', addedBy: 'Seed', rating: 4.4, lat: 39.6091987, lng: -105.085005, menuUrl: 'https://lakehousekt.com/menu' },
+    { id: 'r2', name: 'Seagull\'s Restaurant', category: 'Restaurant', notes: 'Right at Chatfield Marina — closest option, counter service, lake/mountain views', addedBy: 'Seed', rating: 4.5, lat: 39.544061, lng: -105.0608381, menuUrl: 'https://chatfield-marina.com/seagulls-restaurant/' },
+    { id: 'r3', name: 'Farm House Restaurant at Breckenridge Brewery', category: 'Brewery', notes: 'Outdoor beer garden, stage, games', addedBy: 'Seed', rating: 4.5, lat: 39.5936492, lng: -105.02503019999999, menuUrl: 'https://breckbrewpub.com/menu/dinner' },
+    { id: 'r4', name: 'Breckenridge Brewery', category: 'Brewery', notes: 'Along the river/bike trail, pet friendly', addedBy: 'Seed', rating: 4.3, lat: 39.5935813, lng: -105.0250782, menuUrl: 'https://breckbrewpub.com/menu/dinner' },
+    { id: 'r5', name: 'Angelo\'s Taverna - Littleton', category: 'Restaurant', notes: 'Italian, wood-fired pizza, oysters, popular', addedBy: 'Seed', rating: 4.6, lat: 39.5921999, lng: -105.0228161, menuUrl: 'https://angelostaverna.com/littleton-location' },
+    { id: 'r6', name: 'Lariat Lodge Brewing Company', category: 'Brewery', notes: 'Burgers, big beer list, deck', addedBy: 'Seed', rating: 4.4, lat: 39.5795146, lng: -105.1404369, menuUrl: 'https://lariatlodgebrewing.com/littleton-food/' },
+    { id: 'r7', name: 'Homegrown Tap & Dough', category: 'Restaurant', notes: 'Pizza, arcade room, family friendly', addedBy: 'Seed', rating: 4.6, lat: 39.5790931, lng: -105.1384082, menuUrl: 'https://www.tapanddough.com/menus/' },
+    { id: 'r8', name: 'Cafe Terracotta', category: 'Coffee/Cafe', notes: 'Coffee + full dinner menu, cozy historic building', addedBy: 'Seed', rating: 4.6, lat: 39.6147285, lng: -105.0186864, menuUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJS1p27jKAbIcRhyVrpIoFBkw' },
+    { id: 'r9', name: 'Enchanted Grounds', category: 'Coffee/Cafe', notes: 'Coffee shop with games, breakfast burritos', addedBy: 'Seed', rating: 4.6, lat: 39.609959, lng: -105.034867, menuUrl: 'https://enchantedgrounds.com/pages/cafe-menu' },
+    { id: 'r10', name: 'Lost Coffee (Littleton Blvd)', category: 'Coffee/Cafe', notes: 'Great lattes, patio, dog friendly', addedBy: 'Seed', rating: 4.8, lat: 39.6129021, lng: -105.0017914, menuUrl: 'https://www.lostcoffee.com/pages/littleton' },
+    { id: 'r11', name: 'Hearth Bakery & Cafe', category: 'Coffee/Cafe', notes: 'Bakery, breakfast sandwiches, dog friendly patio', addedBy: 'Seed', rating: 4.7, lat: 39.6150164, lng: -105.0181407, menuUrl: 'https://www.hearthdenver.com/' },
+    { id: 'r12', name: 'Zymos Brewing', category: 'Brewery', notes: 'Small neighborhood brewery, highly rated', addedBy: 'Seed', rating: 4.9, lat: 39.6229785, lng: -105.0345956, menuUrl: 'https://www.zymosbrewing.com/' },
+    { id: 'r13', name: 'Littleton Brewing Company', category: 'Brewery', notes: 'Rooftop patio, sunset views, karaoke nights', addedBy: 'Seed', rating: 4.6, lat: 39.613533, lng: -105.002058, menuUrl: 'https://www.littletonbrewco.com/foodmenu' },
+    { id: 'r14', name: 'Comet Brews', category: 'Brewery', notes: 'Small batch, cozy, downtown Littleton', addedBy: 'Seed', rating: 4.6, lat: 39.6144319, lng: -105.0148134, menuUrl: 'https://cometbrews.com/' },
+    { id: 'r15', name: 'Coal Mine Ave Brewing Company', category: 'Brewery', notes: 'Dog park on site, food trucks', addedBy: 'Seed', rating: 4.5, lat: 39.5962829, lng: -105.1068649, menuUrl: 'https://coalmineavebrewing.com/menu' },
+    { id: 'r16', name: 'Locavore Beer Works', category: 'Brewery', notes: 'Pinball, BBQ + Italian food delivery to table', addedBy: 'Seed', rating: 4.7, lat: 39.6088021, lng: -105.0362009, menuUrl: 'https://taplist.io/locavorebeerworks' },
+    { id: 'r17', name: 'Waterton Tavern', category: 'Restaurant', notes: 'Near Roxborough State Park, wings, pinball', addedBy: 'Seed', rating: 4.3, lat: 39.4845617, lng: -105.0748741, menuUrl: 'https://watertontavern.com/food-menu' },
+    { id: 'r18', name: 'NoNo\'s Cafe', category: 'Restaurant', notes: 'Cajun/Creole, brunch, gumbo', addedBy: 'Seed', rating: 4.6, lat: 39.5665804, lng: -105.0267587, menuUrl: 'https://nonoscafe.com/signature-menu/' },
+    { id: 'r19', name: 'Smokin Fins - Highlands Ranch', category: 'Restaurant', notes: 'Seafood + sushi, oysters, patio', addedBy: 'Seed', rating: 4.4, lat: 39.548304, lng: -105.0013667, menuUrl: 'https://www.smokinfinsrestaurant.com/highlandsranch' },
+    { id: 'r20', name: 'Lazy Dog Restaurant & Bar', category: 'Restaurant', notes: 'Big American menu, late hours, patio', addedBy: 'Seed', rating: 4.5, lat: 39.5626642, lng: -104.988466, menuUrl: 'https://orders.lazydogrestaurants.com/menu' },
+    { id: 'r21', name: 'Atlas Coffee | Salta', category: 'Coffee/Cafe', notes: 'Sterling Ranch, big open space with full bar too', addedBy: 'Seed', rating: 4.4, lat: 39.5068255, lng: -105.0371524, menuUrl: 'https://www.atlascoffees.com/menu-1' },
+    { id: 'r22', name: 'Living The Dream Taproom at Sterling Ranch', category: 'Brewery', notes: 'Craft beer taproom, easy Sterling Ranch location', addedBy: 'Seed', rating: 4.4, lat: 39.5068136, lng: -105.0374517, menuUrl: 'https://livingthedreambrewing.com/' },
+    { id: 'r23', name: 'JP\'s Asian Bistro', category: 'Restaurant', notes: 'Roxborough Park area, Chinese classics + sushi, over 20 years local', addedBy: 'Seed', rating: 4.5, lat: 39.4829256, lng: -105.0740349, menuUrl: 'https://jpsasianbistro.getbento.com/online-ordering/jps-asian-bistro/menu' },
+    { id: 'r24', name: 'Rosa Mexican Kitchen', category: 'Restaurant', notes: 'Roxborough Park area, fresh/authentic, grab-and-go style', addedBy: 'Seed', rating: 4.5, lat: 39.4830223, lng: -105.0742359, menuUrl: 'https://rosa-mexican-kitchen-littletonco.cloveronline.com/menu/all' }
   ],
   links: [
     { id: 'l1', label: 'Chatfield State Park (CPW)', url: 'https://cpw.state.co.us/placestogo/parks/Chatfield', notes: 'Official park info, alerts, camping rules' },
@@ -88,8 +92,8 @@ function loadData() {
       }
     }
 
-    // Backfill lat/lng onto previously-seeded restaurants that predate coordinates
-    // being added, matched by id, without touching guest-added entries.
+    // Backfill lat/lng and menuUrl onto previously-seeded restaurants that
+    // predate those fields, matched by id, without touching guest-added entries.
     if (Array.isArray(parsed.restaurants)) {
       const defaultsById = {};
       for (const d of DEFAULTS.restaurants) defaultsById[d.id] = d;
@@ -99,6 +103,20 @@ function loadData() {
           r.lat = seedMatch.lat;
           r.lng = seedMatch.lng;
           changed = true;
+        }
+        if (seedMatch && !r.menuUrl && seedMatch.menuUrl) {
+          r.menuUrl = seedMatch.menuUrl;
+          changed = true;
+        }
+      }
+      // Add any brand-new seed restaurants (e.g. r21+) that aren't in the
+      // deployed data yet, without duplicating or touching existing entries.
+      const existingIds = new Set(parsed.restaurants.map(r => r.id));
+      for (const d of DEFAULTS.restaurants) {
+        if (!existingIds.has(d.id)) {
+          parsed.restaurants.push(JSON.parse(JSON.stringify(d)));
+          changed = true;
+          console.log(`Added new seed restaurant "${d.name}"`);
         }
       }
     }
@@ -130,7 +148,7 @@ app.get('/api/data', (req, res) => {
 });
 
 app.post('/api/restaurants', (req, res) => {
-  const { name, category, notes, addedBy, lat, lng } = req.body;
+  const { name, category, notes, addedBy, lat, lng, menuUrl } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   const item = {
     id: 'r' + Date.now(),
@@ -140,11 +158,21 @@ app.post('/api/restaurants', (req, res) => {
     addedBy: addedBy || 'Guest',
     rating: null,
     lat: typeof lat === 'number' ? lat : null,
-    lng: typeof lng === 'number' ? lng : null
+    lng: typeof lng === 'number' ? lng : null,
+    menuUrl: typeof menuUrl === 'string' && menuUrl.trim() ? menuUrl.trim() : null
   };
   cache.restaurants.push(item);
   saveData(cache);
   res.json(item);
+});
+
+app.put('/api/restaurants/:id', (req, res) => {
+  const r = cache.restaurants.find(x => x.id === req.params.id);
+  if (!r) return res.status(404).json({ error: 'not found' });
+  const { menuUrl } = req.body;
+  if (typeof menuUrl === 'string') r.menuUrl = menuUrl.trim() || null;
+  saveData(cache);
+  res.json(r);
 });
 
 app.delete('/api/restaurants/:id', (req, res) => {

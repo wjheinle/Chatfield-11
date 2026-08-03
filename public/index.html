@@ -274,6 +274,24 @@
   .cat-Coffee\/Cafe { background: #e2eef2; color: var(--lake); }
   .place-notes { font-size: 13px; color: var(--text-mid); margin-top: 5px; }
   .place-meta { font-size: 12px; color: #94a08c; margin-top: 6px; display: flex; justify-content: space-between; }
+  .menu-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--lake);
+    background: #eaf3f6;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .menu-link-add {
+    color: var(--text-mid);
+    background: var(--cream);
+  }
   .place-rating { color: var(--amber); font-weight: 700; }
   .del-btn { background: none; border: none; color: #c2543a; font-size: 12px; cursor: pointer; padding: 0; }
 
@@ -484,6 +502,7 @@
             <option>Coffee/Cafe</option>
           </select>
           <input type="text" id="r-notes" placeholder="Notes (optional)">
+          <input type="text" id="r-menuurl" placeholder="Menu link (optional)">
           <input type="text" id="r-addedby" placeholder="Your name">
           <button class="add-btn" onclick="addRestaurant()">Add Place</button>
         </div>
@@ -798,7 +817,8 @@ function updateEatsMapMarkers(items) {
     const distText = r._driveMins != null
       ? `${r._driveMins.toFixed(0)} min drive (${r._driveMiles.toFixed(1)} mi)`
       : (r._dist != null ? r._dist.toFixed(1) + ' mi (straight-line)' : '');
-    marker.bindPopup(`<b>${escapeHtml(r.name)}</b><br>${r.category}${distText ? '<br>' + distText : ''}`);
+    const menuLink = r.menuUrl ? `<br><a href="${escapeAttr(r.menuUrl)}" target="_blank" rel="noopener">View Menu</a>` : '';
+    marker.bindPopup(`<b>${escapeHtml(r.name)}</b><br>${r.category}${distText ? '<br>' + distText : ''}${menuLink}`);
     eatsMapMarkers.push(marker);
   });
 }
@@ -848,6 +868,10 @@ function renderRestaurants() {
         <span>${distLabel || (r.rating ? '★ ' + r.rating : 'Added by ' + escapeHtml(r.addedBy || 'Guest'))}${distLabel && r.rating ? ' · <span class="place-rating">★ ' + r.rating + '</span>' : ''}</span>
         ${r.addedBy === 'Seed' ? '' : `<button class="del-btn" onclick="deleteRestaurant('${r.id}')">Remove</button>`}
       </div>
+      ${r.menuUrl
+        ? `<a class="menu-link" href="${escapeAttr(r.menuUrl)}" target="_blank" rel="noopener">📋 View Menu</a>`
+        : `<button class="menu-link menu-link-add" onclick="promptMenuLink('${r.id}')">+ Add menu link</button>`
+      }
     </div>
   `;
   }).join('');
@@ -865,23 +889,44 @@ async function addRestaurant() {
   const name = document.getElementById('r-name').value.trim();
   const category = document.getElementById('r-category').value;
   const notes = document.getElementById('r-notes').value.trim();
+  let menuUrl = document.getElementById('r-menuurl').value.trim();
   const addedBy = document.getElementById('r-addedby').value.trim() || 'Guest';
   if (!name) return alert('Please enter a name');
+  if (menuUrl && !/^https?:\/\//i.test(menuUrl)) menuUrl = 'https://' + menuUrl;
   const res = await fetch('/api/restaurants', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, category, notes, addedBy })
+    body: JSON.stringify({ name, category, notes, addedBy, menuUrl })
   });
   const item = await res.json();
   tripData.restaurants.push(item);
   document.getElementById('r-name').value = '';
   document.getElementById('r-notes').value = '';
+  document.getElementById('r-menuurl').value = '';
   renderRestaurants();
 }
 
 async function deleteRestaurant(id) {
   await fetch('/api/restaurants/' + id, { method: 'DELETE' });
   tripData.restaurants = tripData.restaurants.filter(r => r.id !== id);
+  renderRestaurants();
+}
+
+async function promptMenuLink(id) {
+  const r = tripData.restaurants.find(x => x.id === id);
+  if (!r) return;
+  let url = prompt(`Menu link for ${r.name}:`, 'https://');
+  if (!url) return;
+  url = url.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const res = await fetch('/api/restaurants/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ menuUrl: url })
+  });
+  const updated = await res.json();
+  r.menuUrl = updated.menuUrl;
   renderRestaurants();
 }
 
