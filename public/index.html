@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Chatfield 2026</title>
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   :root {
     --pine: #1f3d2e;
@@ -30,7 +31,7 @@
   }
   header.hero {
     position: relative;
-    background: url('images/hero-bg.png') center 35% / cover no-repeat, linear-gradient(160deg, var(--pine) 0%, var(--pine-dark) 60%, #0d1f16 100%);
+    background: url('images/hero-bg.png') center 62% / cover no-repeat, linear-gradient(160deg, var(--pine) 0%, var(--pine-dark) 60%, #0d1f16 100%);
     color: white;
     padding: env(safe-area-inset-top, 20px) 20px 28px;
     overflow: hidden;
@@ -39,7 +40,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(170deg, rgba(20,42,32,0.72) 0%, rgba(15,31,23,0.82) 55%, rgba(13,25,18,0.92) 100%);
+    background: linear-gradient(170deg, rgba(20,42,32,0.5) 0%, rgba(15,31,23,0.62) 55%, rgba(13,25,18,0.78) 100%);
     z-index: 0;
   }
   header.hero::after {
@@ -186,6 +187,57 @@
   @keyframes fadein { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
 
   /* Restaurant list */
+  #eats-map {
+    height: 220px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    z-index: 0;
+  }
+  .leaflet-popup-content { font-family: inherit; font-size: 13px; }
+  .leaflet-popup-content b { color: var(--pine); }
+  .map-marker-num {
+    background: var(--lake);
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .map-marker-camp {
+    background: var(--ember);
+    color: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .map-num-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--lake);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+
   .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
   .filter-chip {
     white-space: nowrap;
@@ -412,7 +464,8 @@
   <section class="tab-panel" id="tab-restaurants">
     <div class="card">
       <h2>🍽️ Nearby Eats &amp; Drinks</h2>
-      <div style="font-size:12px; color:var(--text-mid); margin-bottom:10px;">Within about 15 minutes of the campground</div>
+      <div style="font-size:12px; color:var(--text-mid); margin-bottom:10px;">Sorted closest to the campsite first &middot; driving time</div>
+      <div id="eats-map"></div>
       <div class="filter-row" id="filter-row">
         <button class="filter-chip active" data-filter="All">All</button>
         <button class="filter-chip" data-filter="Restaurant">Restaurant</button>
@@ -508,8 +561,10 @@
   <button data-tab="packing"><span class="icon">🎒</span>Packing</button>
 </nav>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <script>
-const CHECK_IN = new Date('2026-08-12T14:00:00-06:00');
+const CHECK_IN = new Date('2026-08-12T18:00:00-06:00');
 let tripData = { restaurants: [], links: [], packing: [], events: [] };
 let currentFilter = 'All';
 
@@ -520,6 +575,9 @@ document.querySelectorAll('nav.tabbar button').forEach(btn => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'restaurants' && eatsMap) {
+      setTimeout(() => eatsMap.invalidateSize(), 50);
+    }
   });
 });
 
@@ -615,7 +673,7 @@ async function loadData() {
     if (!tripData.restaurants) tripData.restaurants = [];
     if (!tripData.links) tripData.links = [];
     if (!tripData.packing) tripData.packing = [];
-    renderRestaurants();
+    initRestaurantsTab();
     renderLinks();
     renderPacking();
     renderCalendar();
@@ -640,30 +698,168 @@ document.getElementById('filter-row').addEventListener('click', (e) => {
   renderRestaurants();
 });
 
+const CAMPSITE_LAT = 39.533679847245196;
+const CAMPSITE_LNG = -105.06806516610048;
+
+let drivingCache = {}; // keyed by restaurant id -> { miles, mins }
+let eatsMap = null;
+let eatsMapMarkers = [];
+
+function distanceMilesStraightLine(lat1, lng1, lat2, lng2) {
+  const R = 3958.8; // miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// OSRM public demo server — table service gives batch driving distance/duration
+// from the campsite to every restaurant in a single request.
+async function loadDrivingDistances(restaurants) {
+  const withCoords = restaurants.filter(r => typeof r.lat === 'number' && typeof r.lng === 'number');
+  if (!withCoords.length) return;
+
+  const cacheKey = 'chatfield_driving_v1_' + withCoords.map(r => r.id).sort().join(',');
+  try {
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      drivingCache = JSON.parse(cached);
+      return;
+    }
+  } catch (e) { /* sessionStorage unavailable, continue without cache */ }
+
+  try {
+    // coordinates order: campsite first (index 0), then each restaurant
+    const coordStr = [`${CAMPSITE_LNG},${CAMPSITE_LAT}`]
+      .concat(withCoords.map(r => `${r.lng},${r.lat}`))
+      .join(';');
+    const url = `https://router.project-osrm.org/table/v1/driving/${coordStr}?sources=0&annotations=distance,duration`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('OSRM request failed: ' + res.status);
+    const data = await res.json();
+    if (data.code !== 'Ok') throw new Error('OSRM returned: ' + data.code);
+
+    const distances = data.distances[0]; // meters, index 0 = campsite itself
+    const durations = data.durations[0]; // seconds
+
+    const result = {};
+    withCoords.forEach((r, i) => {
+      const meters = distances[i + 1];
+      const seconds = durations[i + 1];
+      if (meters != null && seconds != null) {
+        result[r.id] = { miles: meters / 1609.34, mins: seconds / 60 };
+      }
+    });
+    drivingCache = result;
+    try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch (e) {}
+  } catch (e) {
+    console.warn('Driving distance lookup failed, falling back to straight-line distance', e);
+    drivingCache = {};
+  }
+}
+
+function cssCat(c) { return c.replace('/', '\\/'); }
+
+function initEatsMap() {
+  if (eatsMap || typeof L === 'undefined') return;
+  eatsMap = L.map('eats-map', { zoomControl: true, attributionControl: true }).setView([CAMPSITE_LAT, CAMPSITE_LNG], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(eatsMap);
+
+  const campIcon = L.divIcon({
+    className: '',
+    html: '<div class="map-marker-camp">🏕️</div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13]
+  });
+  L.marker([CAMPSITE_LAT, CAMPSITE_LNG], { icon: campIcon }).addTo(eatsMap).bindPopup('<b>Campsite</b>');
+}
+
+function updateEatsMapMarkers(items) {
+  if (!eatsMap) return;
+  eatsMapMarkers.forEach(m => eatsMap.removeLayer(m));
+  eatsMapMarkers = [];
+
+  const withCoords = items.filter(r => typeof r.lat === 'number' && typeof r.lng === 'number');
+  withCoords.forEach((r, i) => {
+    const num = i + 1;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="map-marker-num">${num}</div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11]
+    });
+    const marker = L.marker([r.lat, r.lng], { icon }).addTo(eatsMap);
+    const distText = r._driveMins != null
+      ? `${r._driveMins.toFixed(0)} min drive (${r._driveMiles.toFixed(1)} mi)`
+      : (r._dist != null ? r._dist.toFixed(1) + ' mi (straight-line)' : '');
+    marker.bindPopup(`<b>${escapeHtml(r.name)}</b><br>${r.category}${distText ? '<br>' + distText : ''}`);
+    eatsMapMarkers.push(marker);
+  });
+}
+
 function renderRestaurants() {
   const list = document.getElementById('restaurant-list');
   let items = tripData.restaurants || [];
   if (currentFilter !== 'All') items = items.filter(r => r.category === currentFilter);
   if (!items.length) {
     list.innerHTML = '<div class="empty-state">No places yet in this category.</div>';
+    updateEatsMapMarkers([]);
     return;
   }
-  items = [...items].sort((a,b) => (b.rating||0) - (a.rating||0));
-  list.innerHTML = items.map(r => `
+  items = [...items].map(r => {
+    const hasCoords = typeof r.lat === 'number' && typeof r.lng === 'number';
+    const driving = drivingCache[r.id];
+    return {
+      ...r,
+      _dist: hasCoords ? distanceMilesStraightLine(CAMPSITE_LAT, CAMPSITE_LNG, r.lat, r.lng) : null,
+      _driveMiles: driving ? driving.miles : null,
+      _driveMins: driving ? driving.mins : null
+    };
+  });
+  items.sort((a, b) => {
+    const aKey = a._driveMins ?? a._dist;
+    const bKey = b._driveMins ?? b._dist;
+    if (aKey === null && bKey === null) return (b.rating||0) - (a.rating||0);
+    if (aKey === null) return 1;
+    if (bKey === null) return -1;
+    return aKey - bKey;
+  });
+  list.innerHTML = items.map((r, i) => {
+    let distLabel = '';
+    if (r._driveMins != null) {
+      distLabel = `🚗 ${r._driveMins.toFixed(0)} min · ${r._driveMiles.toFixed(1)} mi`;
+    } else if (r._dist != null) {
+      distLabel = `${r._dist.toFixed(1)} mi`;
+    }
+    return `
     <div class="place-card">
       <div class="place-top">
-        <div class="place-name">${escapeHtml(r.name)}</div>
+        <div class="place-name">${typeof r.lat === 'number' ? `<span class="map-num-badge">${i+1}</span> ` : ''}${escapeHtml(r.name)}</div>
         <div class="place-cat cat-${cssCat(r.category)}">${r.category}</div>
       </div>
       ${r.notes ? `<div class="place-notes">${escapeHtml(r.notes)}</div>` : ''}
       <div class="place-meta">
-        <span>${r.rating ? '<span class="place-rating">★ ' + r.rating + '</span>' : 'Added by ' + escapeHtml(r.addedBy || 'Guest')}</span>
+        <span>${distLabel || (r.rating ? '★ ' + r.rating : 'Added by ' + escapeHtml(r.addedBy || 'Guest'))}${distLabel && r.rating ? ' · <span class="place-rating">★ ' + r.rating + '</span>' : ''}</span>
         ${r.addedBy === 'Seed' ? '' : `<button class="del-btn" onclick="deleteRestaurant('${r.id}')">Remove</button>`}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
+
+  updateEatsMapMarkers(items);
 }
-function cssCat(c) { return c.replace('/', '\\/'); }
+
+async function initRestaurantsTab() {
+  initEatsMap();
+  await loadDrivingDistances(tripData.restaurants || []);
+  renderRestaurants();
+}
 
 async function addRestaurant() {
   const name = document.getElementById('r-name').value.trim();
